@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Logo } from "@/components/ui/Logo";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -52,124 +47,248 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F2F4] flex items-center justify-center p-4 py-10">
-      <motion.div
-        className="w-full max-w-[420px]"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#F2F2F4",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "420px",
+          background: "#ffffff",
+          borderRadius: "20px",
+          border: "1px solid #E4E4E8",
+          boxShadow: "0 1px 2px rgba(0,0,0,.04), 0 4px 20px rgba(0,0,0,.06)",
+          padding: "36px",
+        }}
       >
-        <div className="bg-white rounded-[20px] border border-[#E4E4E8] shadow-card p-9">
-          <Logo size="md" className="mb-7" />
-
-          <div className="mb-6">
-            <h1 className="text-[22px] font-bold text-[#16151F] tracking-[-0.04em] leading-none mb-1.5">
-              Create your account
-            </h1>
-            <p className="text-[13px] text-[#A09DB8]">
-              Guests join via your event link — no account needed.
-            </p>
+        {/* Logo */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "28px",
+          }}
+        >
+          <div
+            style={{
+              width: "36px",
+              height: "36px",
+              background: "#7C6FE0",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="9" r="7" stroke="#fff" strokeWidth="1.4" />
+              <path
+                d="M6 9l2 2 4-4"
+                stroke="#fff"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
-
-          {errors.general && (
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-5 flex items-start gap-2.5 px-4 py-3 bg-[#FFF0F0] border border-[#FCCFD0] rounded-[10px]"
+          <div>
+            <p
+              style={{
+                fontSize: "17px",
+                fontWeight: 700,
+                color: "#16151F",
+                letterSpacing: "-0.03em",
+                lineHeight: 1,
+              }}
             >
-              <svg
-                className="shrink-0 mt-0.5"
-                width="14"
-                height="14"
-                viewBox="0 0 16 16"
-                fill="none"
-              >
-                <circle
-                  cx="8"
-                  cy="8"
-                  r="7"
-                  stroke="#E5484D"
-                  strokeWidth="1.4"
-                />
-                <path
-                  d="M8 5v3.5M8 11h.01"
-                  stroke="#E5484D"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <p className="text-[13px] text-[#E5484D]">{errors.general}</p>
-            </motion.div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              id="name"
-              label="Full name"
-              placeholder="Adaeze Okonkwo"
-              value={form.name}
-              onChange={set("name")}
-              error={errors.name}
-              required
-            />
-            <Input
-              id="email"
-              type="email"
-              label="Email address"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={set("email")}
-              error={errors.email}
-              required
-            />
-            <Input
-              id="password"
-              type="password"
-              label="Password"
-              placeholder="Minimum 8 characters"
-              value={form.password}
-              onChange={set("password")}
-              error={errors.password}
-              required
-            />
-            <Input
-              id="password_confirmation"
-              type="password"
-              label="Confirm password"
-              placeholder="Repeat your password"
-              value={form.password_confirmation}
-              onChange={set("password_confirmation")}
-              required
-            />
-            <div className="pt-1">
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full"
-                isLoading={loading}
-              >
-                {!loading && (
-                  <>
-                    Create account <ArrowRight size={15} strokeWidth={2} />
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-[#F2F2F4] text-center">
-            <p className="text-[13px] text-[#A09DB8]">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="text-[#7C6FE0] font-semibold hover:text-[#6B5FD0] transition-colors"
-              >
-                Sign in
-              </Link>
+              OwambePay
+            </p>
+            <p
+              style={{
+                fontSize: "10px",
+                fontWeight: 600,
+                color: "#A09DB8",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+                marginTop: "3px",
+              }}
+            >
+              Host portal
             </p>
           </div>
         </div>
-      </motion.div>
+
+        {/* Heading */}
+        <h1
+          style={{
+            fontSize: "22px",
+            fontWeight: 700,
+            color: "#16151F",
+            letterSpacing: "-0.04em",
+            marginBottom: "4px",
+          }}
+        >
+          Create your account
+        </h1>
+        <p style={{ fontSize: "13px", color: "#A09DB8", marginBottom: "24px" }}>
+          Guests join via your event link — no account needed.
+        </p>
+
+        {/* Error */}
+        {errors.general && (
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "12px 14px",
+              background: "#FFF0F0",
+              border: "1px solid #FCCFD0",
+              borderRadius: "10px",
+              fontSize: "13px",
+              color: "#E5484D",
+            }}
+          >
+            {errors.general}
+          </div>
+        )}
+
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+        >
+          {[
+            {
+              id: "name",
+              label: "Full name",
+              type: "text",
+              placeholder: "Adaeze Okonkwo",
+              field: "name",
+            },
+            {
+              id: "email",
+              label: "Email address",
+              type: "email",
+              placeholder: "you@example.com",
+              field: "email",
+            },
+            {
+              id: "password",
+              label: "Password",
+              type: "password",
+              placeholder: "Minimum 8 characters",
+              field: "password",
+            },
+            {
+              id: "password_confirmation",
+              label: "Confirm password",
+              type: "password",
+              placeholder: "Repeat your password",
+              field: "password_confirmation",
+            },
+          ].map(({ id, label, type, placeholder, field }) => (
+            <div
+              key={id}
+              style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+            >
+              <label
+                htmlFor={id}
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: "#6B687E",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {label}
+              </label>
+              <input
+                id={id}
+                type={type}
+                placeholder={placeholder}
+                value={form[field as keyof typeof form]}
+                onChange={set(field)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  fontSize: "14px",
+                  color: "#16151F",
+                  background: "#F8F8FA",
+                  border: `1.5px solid ${errors[field] ? "#E5484D" : "#E4E4E8"}`,
+                  borderRadius: "10px",
+                  outline: "none",
+                  fontFamily: "inherit",
+                }}
+              />
+              {errors[field] && (
+                <p style={{ fontSize: "12px", color: "#E5484D" }}>
+                  {errors[field]}
+                </p>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginTop: "4px",
+              background: loading ? "#B8B0F0" : "#7C6FE0",
+              color: "#fff",
+              fontSize: "14px",
+              fontWeight: 600,
+              border: "none",
+              borderRadius: "10px",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              letterSpacing: "-0.01em",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+            }}
+          >
+            {loading ? "Creating account…" : "Create account →"}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div
+          style={{
+            marginTop: "24px",
+            paddingTop: "20px",
+            borderTop: "1px solid #F2F2F4",
+            textAlign: "center",
+            fontSize: "13px",
+            color: "#A09DB8",
+          }}
+        >
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            style={{
+              color: "#7C6FE0",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Sign in
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
