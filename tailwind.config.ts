@@ -9,34 +9,41 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "sans-serif"],
-        mono: ["GeistMono", "ui-monospace", "monospace"],
+        sans: ["Inter", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
+        accent: {
+          DEFAULT: "#7C6FE0",
+          hover: "#6B5FD0",
+          light: "#EFEDFA",
+          text: "#5548C8",
+        },
         bg: {
-          DEFAULT: "#0A0A0A",
-          2: "#111111",
-          3: "#161616",
+          DEFAULT: "#F2F2F4",
+          surface: "#FFFFFF",
+          2: "#F8F8FA",
         },
         border: {
-          DEFAULT: "#1E1E1E",
-          2: "#2A2A2A",
+          DEFAULT: "#E4E4E8",
+          2: "#D4D4DA",
         },
         ink: {
-          DEFAULT: "#FFFFFF",
-          2: "#888888",
-          3: "#444444",
-        },
-        accent: {
-          DEFAULT: "#18FF6D",
-          dim: "#0F2A1A",
+          DEFAULT: "#16151F",
+          2: "#6B687E",
+          3: "#A09DB8",
         },
       },
       borderRadius: {
-        sm: "6px",
+        sm: "8px",
         md: "10px",
         lg: "14px",
         xl: "20px",
+        "2xl": "28px",
+      },
+      boxShadow: {
+        card: "0 1px 2px rgba(0,0,0,.04), 0 4px 20px rgba(0,0,0,.04)",
+        sm: "0 1px 3px rgba(0,0,0,.06)",
       },
     },
   },

@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Logo } from "@/components/ui/Logo";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -15,7 +16,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     password_confirmation: "",
-    role: "host" as "host" | "guest",
+    role: "host" as const,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -51,46 +52,53 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 py-10">
+    <div className="min-h-screen bg-[#F2F2F4] flex items-center justify-center p-4 py-10">
       <motion.div
-        className="w-full max-w-[400px]"
-        initial={{ opacity: 0, y: 20 }}
+        className="w-full max-w-[420px]"
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="mb-8">
-          <div className="w-10 h-10 bg-[#18FF6D] rounded-[10px] flex items-center justify-center mb-5">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8z"
-                stroke="#000"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M7 10l2 2 4-4"
-                stroke="#000"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <h1 className="text-[24px] font-bold text-white tracking-[-0.04em] leading-none mb-1.5">
-            Create host account
-          </h1>
-          <p className="text-[13px] text-[#555]">
-            Guests don't need accounts — they join via your event link.
-          </p>
-        </div>
+        <div className="bg-white rounded-[20px] border border-[#E4E4E8] shadow-card p-9">
+          <Logo size="md" className="mb-7" />
 
-        <div className="bg-[#111] border border-[#1E1E1E] rounded-[16px] p-6">
+          <div className="mb-6">
+            <h1 className="text-[22px] font-bold text-[#16151F] tracking-[-0.04em] leading-none mb-1.5">
+              Create your account
+            </h1>
+            <p className="text-[13px] text-[#A09DB8]">
+              Guests join via your event link — no account needed.
+            </p>
+          </div>
+
           {errors.general && (
             <motion.div
-              initial={{ opacity: 0, y: -4 }}
+              initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-5 px-4 py-3 bg-[#2A0F0F] border border-[#FF4444]/20 rounded-[10px] text-[13px] text-[#FF4444]"
+              className="mb-5 flex items-start gap-2.5 px-4 py-3 bg-[#FFF0F0] border border-[#FCCFD0] rounded-[10px]"
             >
-              {errors.general}
+              <svg
+                className="shrink-0 mt-0.5"
+                width="14"
+                height="14"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="#E5484D"
+                  strokeWidth="1.4"
+                />
+                <path
+                  d="M8 5v3.5M8 11h.01"
+                  stroke="#E5484D"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <p className="text-[13px] text-[#E5484D]">{errors.general}</p>
             </motion.div>
           )}
 
@@ -107,7 +115,7 @@ export default function RegisterPage() {
             <Input
               id="email"
               type="email"
-              label="Email"
+              label="Email address"
               placeholder="you@example.com"
               value={form.email}
               onChange={set("email")}
@@ -118,7 +126,7 @@ export default function RegisterPage() {
               id="password"
               type="password"
               label="Password"
-              placeholder="Min. 8 characters"
+              placeholder="Minimum 8 characters"
               value={form.password}
               onChange={set("password")}
               error={errors.password}
@@ -128,7 +136,7 @@ export default function RegisterPage() {
               id="password_confirmation"
               type="password"
               label="Confirm password"
-              placeholder="Repeat password"
+              placeholder="Repeat your password"
               value={form.password_confirmation}
               onChange={set("password_confirmation")}
               required
@@ -136,8 +144,8 @@ export default function RegisterPage() {
             <div className="pt-1">
               <Button
                 type="submit"
-                className="w-full"
                 size="lg"
+                className="w-full"
                 isLoading={loading}
               >
                 {!loading && (
@@ -148,17 +156,19 @@ export default function RegisterPage() {
               </Button>
             </div>
           </form>
-        </div>
 
-        <p className="text-center text-[13px] text-[#444] mt-5">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-[#18FF6D] hover:text-white transition-colors font-medium"
-          >
-            Sign in
-          </Link>
-        </p>
+          <div className="mt-6 pt-6 border-t border-[#F2F2F4] text-center">
+            <p className="text-[13px] text-[#A09DB8]">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-[#7C6FE0] font-semibold hover:text-[#6B5FD0] transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
