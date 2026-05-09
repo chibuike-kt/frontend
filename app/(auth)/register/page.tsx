@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -13,41 +15,35 @@ export default function RegisterPage() {
     email: "",
     password: "",
     password_confirmation: "",
-    role: "guest" as "host" | "guest",
+    role: "host" as "host" | "guest",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const set =
-    (field: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((p) => ({ ...p, [field]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setLoading(true);
-
     try {
       await register(form);
     } catch (err: unknown) {
-      const axiosError = err as {
+      const ax = err as {
         response?: {
           data?: { errors?: Record<string, string[]>; message?: string };
         };
       };
-      const apiErrors = axiosError.response?.data?.errors ?? {};
+      const raw = ax.response?.data?.errors ?? {};
       const flat: Record<string, string> = {};
-      Object.entries(apiErrors).forEach(([key, messages]) => {
-        flat[key] = Array.isArray(messages) ? messages[0] : messages;
+      Object.entries(raw).forEach(([k, v]) => {
+        flat[k] = Array.isArray(v) ? v[0] : v;
       });
       setErrors(
-        Object.keys(flat).length > 0
+        Object.keys(flat).length
           ? flat
-          : {
-              general:
-                axiosError.response?.data?.message ?? "Registration failed.",
-            },
+          : { general: ax.response?.data?.message ?? "Registration failed." },
       );
     } finally {
       setLoading(false);
@@ -55,27 +51,47 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-orange-50 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-violet-600 rounded-2xl mb-4 shadow-lg shadow-violet-200">
-            <span className="text-white text-2xl">💸</span>
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 py-10">
+      <motion.div
+        className="w-full max-w-[400px]"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div className="mb-8">
+          <div className="w-10 h-10 bg-[#18FF6D] rounded-[10px] flex items-center justify-center mb-5">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8z"
+                stroke="#000"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M7 10l2 2 4-4"
+                stroke="#000"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">OwambePay</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Create your account to get started
+          <h1 className="text-[24px] font-bold text-white tracking-[-0.04em] leading-none mb-1.5">
+            Create host account
+          </h1>
+          <p className="text-[13px] text-[#555]">
+            Guests don't need accounts — they join via your event link.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">
-            Create an account
-          </h2>
-
+        <div className="bg-[#111] border border-[#1E1E1E] rounded-[16px] p-6">
           {errors.general && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 px-4 py-3 bg-[#2A0F0F] border border-[#FF4444]/20 rounded-[10px] text-[13px] text-[#FF4444]"
+            >
               {errors.general}
-            </div>
+            </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,36 +107,13 @@ export default function RegisterPage() {
             <Input
               id="email"
               type="email"
-              label="Email address"
+              label="Email"
               placeholder="you@example.com"
               value={form.email}
               onChange={set("email")}
               error={errors.email}
               required
             />
-
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="role"
-                className="text-sm font-medium text-gray-700"
-              >
-                I am joining as
-              </label>
-              <select
-                id="role"
-                value={form.role}
-                onChange={set("role")}
-                className="w-full px-3.5 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 hover:border-gray-300 transition-colors"
-              >
-                <option value="guest">
-                  Guest — I want to spray money at parties
-                </option>
-                <option value="host">
-                  Host — I want to receive money at my event
-                </option>
-              </select>
-            </div>
-
             <Input
               id="password"
               type="password"
@@ -135,33 +128,38 @@ export default function RegisterPage() {
               id="password_confirmation"
               type="password"
               label="Confirm password"
-              placeholder="••••••••"
+              placeholder="Repeat password"
               value={form.password_confirmation}
               onChange={set("password_confirmation")}
               required
             />
-
-            <Button
-              type="submit"
-              className="w-full mt-2"
-              isLoading={loading}
-              size="lg"
-            >
-              Create account
-            </Button>
+            <div className="pt-1">
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                isLoading={loading}
+              >
+                {!loading && (
+                  <>
+                    Create account <ArrowRight size={15} strokeWidth={2} />
+                  </>
+                )}
+              </Button>
+            </div>
           </form>
-
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-violet-600 font-medium hover:text-violet-700"
-            >
-              Sign in
-            </Link>
-          </p>
         </div>
-      </div>
+
+        <p className="text-center text-[13px] text-[#444] mt-5">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-[#18FF6D] hover:text-white transition-colors font-medium"
+          >
+            Sign in
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
 }

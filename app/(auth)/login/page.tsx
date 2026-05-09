@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -17,89 +19,110 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login({ email, password });
     } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setError(
-        axiosError.response?.data?.message ??
-          "Login failed. Please check your credentials.",
-      );
+      const e = err as { response?: { data?: { message?: string } } };
+      setError(e.response?.data?.message ?? "Invalid credentials.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-orange-50 p-4">
-      <div className="w-full max-w-md">
-        {/* Logo / Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-violet-600 rounded-2xl mb-4 shadow-lg shadow-violet-200">
-            <span className="text-white text-2xl">💸</span>
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+      <motion.div
+        className="w-full max-w-[380px]"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {/* Logo */}
+        <div className="mb-8">
+          <div className="w-10 h-10 bg-[#18FF6D] rounded-[10px] flex items-center justify-center mb-5">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8z"
+                stroke="#000"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M7 10l2 2 4-4"
+                stroke="#000"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">OwambePay</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Digital money spraying for modern celebrations
+          <h1 className="text-[24px] font-bold text-white tracking-[-0.04em] leading-none mb-1.5">
+            OwambePay
+          </h1>
+          <p className="text-[13px] text-[#555]">
+            Host portal · Sign in to your account
           </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">
-            Sign in to your account
-          </h2>
-
+        {/* Form card */}
+        <div className="bg-[#111] border border-[#1E1E1E] rounded-[16px] p-6">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 px-4 py-3 bg-[#2A0F0F] border border-[#FF4444]/20 rounded-[10px] text-[13px] text-[#FF4444]"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               id="email"
               type="email"
-              label="Email address"
+              label="Email"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               autoComplete="email"
+              required
             />
             <Input
               id="password"
               type="password"
               label="Password"
-              placeholder="••••••••"
+              placeholder="Your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               autoComplete="current-password"
+              required
             />
-
-            <Button
-              type="submit"
-              className="w-full mt-2"
-              isLoading={loading}
-              size="lg"
-            >
-              Sign in
-            </Button>
+            <div className="pt-1">
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                isLoading={loading}
+              >
+                {!loading && (
+                  <>
+                    Sign in <ArrowRight size={15} strokeWidth={2} />
+                  </>
+                )}
+              </Button>
+            </div>
           </form>
-
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="text-violet-600 font-medium hover:text-violet-700"
-            >
-              Create one
-            </Link>
-          </p>
         </div>
-      </div>
+
+        <p className="text-center text-[13px] text-[#444] mt-5">
+          No account?{" "}
+          <Link
+            href="/register"
+            className="text-[#18FF6D] hover:text-white transition-colors font-medium"
+          >
+            Create one
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
 }
