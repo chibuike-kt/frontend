@@ -32,6 +32,13 @@ export default function EventPage() {
       .catch(() => setNotFound(true));
   }, [slug]);
 
+  const netAmount =
+    fundAmount && parseFloat(fundAmount) >= 100
+      ? (parseFloat(fundAmount) * 0.98).toLocaleString("en-NG", {
+          minimumFractionDigits: 2,
+        })
+      : null;
+
   const handleJoin = async () => {
     const errs: Record<string, string> = {};
     if (!guestName.trim()) errs.name = "Enter your name.";
@@ -47,27 +54,36 @@ export default function EventPage() {
     setFieldError({});
 
     try {
-      const res = await axios.post(`/api/events/${slug}/join`, {
+      const res = await axios.post(`/api/events/${slug}/initialize-guest`, {
         guest_name: guestName.trim(),
         fund_amount: parseFloat(fundAmount),
       });
 
-      // Store session data for the spray room
+      // Save name for after redirect
       sessionStorage.setItem("owambe_guest_name", guestName.trim());
-      sessionStorage.setItem("owambe_guest_token", res.data.guest_token);
-      sessionStorage.setItem("owambe_wallet_id", res.data.wallet_id);
-      sessionStorage.setItem("owambe_balance", String(res.data.balance));
+      sessionStorage.setItem("owambe_fund_amount", fundAmount);
       sessionStorage.setItem("owambe_event_slug", slug);
 
-      router.push(`/event/${slug}/spray`);
+      // Redirect to DevWallet
+      window.location.href = res.data.authorization_url;
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } };
       setError(
-        err.response?.data?.message ?? "Failed to join. Please try again.",
+        err.response?.data?.message ??
+          "Failed to initialize payment. Please try again.",
       );
-    } finally {
       setJoining(false);
     }
+  };
+
+  const spin: React.CSSProperties = {
+    width: "18px",
+    height: "18px",
+    borderRadius: "50%",
+    border: "2px solid rgba(255,255,255,0.3)",
+    borderTopColor: "#fff",
+    animation: "spin 0.7s linear infinite",
+    display: "inline-block",
   };
 
   if (notFound)
@@ -129,12 +145,6 @@ export default function EventPage() {
     );
 
   const isEnded = event.status === "ended";
-  const netAmount =
-    fundAmount && parseFloat(fundAmount) >= 100
-      ? (parseFloat(fundAmount) * 0.98).toLocaleString("en-NG", {
-          minimumFractionDigits: 2,
-        })
-      : null;
 
   return (
     <div
@@ -150,6 +160,7 @@ export default function EventPage() {
     >
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       <div style={{ width: "100%", maxWidth: "420px" }}>
+        {/* Brand */}
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <div
             style={{
@@ -160,7 +171,7 @@ export default function EventPage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 12px",
+              margin: "0 auto 10px",
               fontSize: "26px",
             }}
           >
@@ -168,7 +179,7 @@ export default function EventPage() {
           </div>
           <p
             style={{
-              fontSize: "12px",
+              fontSize: "11px",
               fontWeight: 600,
               color: "#A09DB8",
               textTransform: "uppercase",
@@ -185,13 +196,13 @@ export default function EventPage() {
             borderRadius: "20px",
             border: "1px solid #E4E4E8",
             boxShadow: "0 4px 24px rgba(0,0,0,.06)",
-            padding: "32px",
+            overflow: "hidden",
           }}
         >
+          {/* Event header */}
           <div
             style={{
-              marginBottom: "24px",
-              paddingBottom: "20px",
+              padding: "24px 28px 20px",
               borderBottom: "1px solid #F2F2F4",
             }}
           >
@@ -228,7 +239,7 @@ export default function EventPage() {
           </div>
 
           {isEnded ? (
-            <div style={{ textAlign: "center", padding: "8px 0" }}>
+            <div style={{ padding: "40px 28px", textAlign: "center" }}>
               <p style={{ fontSize: "36px", marginBottom: "10px" }}>🎉</p>
               <p
                 style={{
@@ -245,12 +256,11 @@ export default function EventPage() {
               </p>
             </div>
           ) : (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "14px" }}
-            >
+            <div style={{ padding: "24px 28px" }}>
               {error && (
                 <div
                   style={{
+                    marginBottom: "16px",
                     padding: "11px 14px",
                     background: "#FFF0F0",
                     border: "1px solid #FCCFD0",
@@ -263,162 +273,261 @@ export default function EventPage() {
                 </div>
               )}
 
-              {/* Name */}
               <div
-                style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                }}
               >
-                <label
+                {/* Name */}
+                <div
                   style={{
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    color: "#6B687E",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "5px",
                   }}
                 >
-                  Your name
-                </label>
-                <input
-                  value={guestName}
-                  onChange={(e) => {
-                    setGuestName(e.target.value);
-                    setFieldError((p) => ({ ...p, name: "" }));
-                  }}
-                  placeholder="Chidi Okeke"
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    fontSize: "14px",
-                    color: "#16151F",
-                    background: "#F8F8FA",
-                    border: `1.5px solid ${fieldError.name ? "#E5484D" : "#E4E4E8"}`,
-                    borderRadius: "10px",
-                    outline: "none",
-                    fontFamily: "inherit",
-                  }}
-                />
-                {fieldError.name && (
-                  <p style={{ fontSize: "12px", color: "#E5484D" }}>
-                    {fieldError.name}
-                  </p>
-                )}
-              </div>
-
-              {/* Fund amount */}
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "5px" }}
-              >
-                <label
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    color: "#6B687E",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
-                  }}
-                >
-                  How much do you want to spray?
-                </label>
-                <div style={{ position: "relative" }}>
-                  <span
+                  <label
                     style={{
-                      position: "absolute",
-                      left: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      fontSize: "13px",
-                      color: "#A09DB8",
-                      pointerEvents: "none",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      color: "#6B687E",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
                     }}
                   >
-                    ₦
-                  </span>
+                    Your name
+                  </label>
                   <input
-                    type="number"
-                    value={fundAmount}
+                    value={guestName}
                     onChange={(e) => {
-                      setFundAmount(e.target.value);
-                      setFieldError((p) => ({ ...p, amount: "" }));
+                      setGuestName(e.target.value);
+                      setFieldError((p) => ({ ...p, name: "" }));
                     }}
-                    placeholder="0.00"
+                    placeholder="Chidi Okeke"
                     style={{
                       width: "100%",
-                      padding: "10px 14px 10px 28px",
+                      padding: "10px 14px",
                       fontSize: "14px",
                       color: "#16151F",
                       background: "#F8F8FA",
-                      border: `1.5px solid ${fieldError.amount ? "#E5484D" : "#E4E4E8"}`,
+                      border: `1.5px solid ${fieldError.name ? "#E5484D" : "#E4E4E8"}`,
                       borderRadius: "10px",
                       outline: "none",
                       fontFamily: "inherit",
                     }}
                   />
+                  {fieldError.name && (
+                    <p style={{ fontSize: "12px", color: "#E5484D" }}>
+                      {fieldError.name}
+                    </p>
+                  )}
                 </div>
-                {fieldError.amount && (
-                  <p style={{ fontSize: "12px", color: "#E5484D" }}>
-                    {fieldError.amount}
-                  </p>
-                )}
-                {netAmount && (
-                  <p style={{ fontSize: "12px", color: "#30A46C" }}>
-                    ✓ You&apos;ll have ₦{netAmount} to spray after 2% fee
-                  </p>
-                )}
-              </div>
 
-              {/* Quick amounts */}
-              <div style={{ display: "flex", gap: "6px" }}>
-                {["500", "1000", "2000", "5000"].map((amt) => (
-                  <button
-                    key={amt}
-                    onClick={() => setFundAmount(amt)}
+                {/* Amount */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "5px",
+                  }}
+                >
+                  <label
                     style={{
-                      flex: 1,
-                      padding: "7px 0",
-                      fontSize: "12px",
+                      fontSize: "11px",
                       fontWeight: 600,
-                      color: fundAmount === amt ? "#7C6FE0" : "#6B687E",
-                      background: fundAmount === amt ? "#EFEDFA" : "#F8F8FA",
-                      border: `1.5px solid ${fundAmount === amt ? "#7C6FE0" : "#E4E4E8"}`,
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      fontFamily: "inherit",
+                      color: "#6B687E",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
                     }}
                   >
-                    ₦{parseInt(amt).toLocaleString()}
-                  </button>
-                ))}
+                    How much do you want to spray?
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        fontSize: "13px",
+                        color: "#A09DB8",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ₦
+                    </span>
+                    <input
+                      type="number"
+                      value={fundAmount}
+                      onChange={(e) => {
+                        setFundAmount(e.target.value);
+                        setFieldError((p) => ({ ...p, amount: "" }));
+                      }}
+                      placeholder="0.00"
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px 10px 28px",
+                        fontSize: "14px",
+                        color: "#16151F",
+                        background: "#F8F8FA",
+                        border: `1.5px solid ${fieldError.amount ? "#E5484D" : "#E4E4E8"}`,
+                        borderRadius: "10px",
+                        outline: "none",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+                  {fieldError.amount && (
+                    <p style={{ fontSize: "12px", color: "#E5484D" }}>
+                      {fieldError.amount}
+                    </p>
+                  )}
+                </div>
+
+                {/* Quick amounts */}
+                <div style={{ display: "flex", gap: "6px" }}>
+                  {["500", "1000", "2000", "5000"].map((amt) => (
+                    <button
+                      key={amt}
+                      onClick={() => setFundAmount(amt)}
+                      style={{
+                        flex: 1,
+                        padding: "7px 0",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        color: fundAmount === amt ? "#7C6FE0" : "#6B687E",
+                        background: fundAmount === amt ? "#EFEDFA" : "#F8F8FA",
+                        border: `1.5px solid ${fundAmount === amt ? "#7C6FE0" : "#E4E4E8"}`,
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      ₦{parseInt(amt).toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Fee breakdown */}
+                {netAmount && (
+                  <div
+                    style={{
+                      padding: "12px 14px",
+                      background: "#F8F8FA",
+                      borderRadius: "10px",
+                      border: "1px solid #E4E4E8",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      <span style={{ fontSize: "12px", color: "#A09DB8" }}>
+                        You pay
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "#16151F",
+                          fontWeight: 500,
+                        }}
+                      >
+                        ₦{parseFloat(fundAmount).toLocaleString()}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      <span style={{ fontSize: "12px", color: "#A09DB8" }}>
+                        Platform fee (2%)
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#E5484D" }}>
+                        −₦
+                        {(parseFloat(fundAmount) * 0.02).toLocaleString(
+                          "en-NG",
+                          { minimumFractionDigits: 2 },
+                        )}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        paddingTop: "6px",
+                        borderTop: "1px solid #E4E4E8",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          color: "#16151F",
+                        }}
+                      >
+                        Available to spray
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          color: "#30A46C",
+                        }}
+                      >
+                        ₦{netAmount}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Submit */}
+                <button
+                  onClick={handleJoin}
+                  disabled={joining}
+                  style={{
+                    width: "100%",
+                    padding: "13px",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#fff",
+                    background: joining ? "#B8B0F0" : "#7C6FE0",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: joining ? "not-allowed" : "pointer",
+                    fontFamily: "inherit",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  {joining ? (
+                    <>
+                      <span style={spin} /> Redirecting to payment…
+                    </>
+                  ) : (
+                    "Pay & enter celebration 🎊"
+                  )}
+                </button>
+
+                <p
+                  style={{
+                    fontSize: "11px",
+                    color: "#C4C2D4",
+                    textAlign: "center",
+                  }}
+                >
+                  Secured by DevWallet · 2% platform fee applies
+                </p>
               </div>
-
-              <button
-                onClick={handleJoin}
-                disabled={joining}
-                style={{
-                  width: "100%",
-                  padding: "13px",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: "#fff",
-                  background: joining ? "#B8B0F0" : "#7C6FE0",
-                  border: "none",
-                  borderRadius: "10px",
-                  cursor: joining ? "not-allowed" : "pointer",
-                  fontFamily: "inherit",
-                  marginTop: "4px",
-                }}
-              >
-                {joining ? "Setting up…" : "Enter & start spraying 🎊"}
-              </button>
-
-              <p
-                style={{
-                  fontSize: "11px",
-                  color: "#C4C2D4",
-                  textAlign: "center",
-                }}
-              >
-                2% platform fee applies on funding
-              </p>
             </div>
           )}
         </div>
