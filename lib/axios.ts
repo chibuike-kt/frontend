@@ -1,14 +1,14 @@
-import Axios from 'axios'
+import Axios from "axios";
 
 const axios = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
-    'X-Requested-With': 'XMLHttpRequest',
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "X-Requested-With": "XMLHttpRequest",
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
-  withCredentials: true,      // sends cookies cross-origin
-  withXSRFToken: true,        // Axios handles XSRF token automatically
-})
+  withCredentials: true,
+  withXSRFToken: true,
+});
 
-export default axios
+export default axios;

@@ -21,7 +21,6 @@ export interface LoginPayload {
   password: string;
 }
 
-// Fetch the CSRF cookie before any state-mutating request
 async function getCsrfCookie(): Promise<void> {
   await axios.get("/sanctum/csrf-cookie");
 }
